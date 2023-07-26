@@ -8,7 +8,7 @@ const tagModel = require("../models/tagModel");
 //const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const createPost = async function (req, res) {
-  try {
+ 
     let {
       title,
       short_description,
@@ -60,14 +60,12 @@ const createPost = async function (req, res) {
         message: "Post added successfully",
         data: postCreated,
       });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+ 
 };
 
 
 const getPostById = async function (req, res) {
-  try {
+  
     let postId = req.params.id;
     if (!isValidObjectId(postId))
       return res
@@ -104,9 +102,7 @@ const getPostById = async function (req, res) {
 
     //profile_image = resolvedPath;   
     return res.status(200).send({ status: true, data: data });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+ 
 };
 
 
@@ -114,7 +110,7 @@ const getPostById = async function (req, res) {
 
 
 const getAllPosts = async function (req, res) {
-  try {
+ 
     const postList = await postModel.find();
     if (!postList)
       return res
@@ -122,16 +118,14 @@ const getAllPosts = async function (req, res) {
         .send({ status: false, message: "No post to show" });
 
     return res.status(200).send({ status: true, data: postList });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+
 };
 
 
 
 
 const updatePost = async function (req, res) {
-  try {
+  
     // let data = req.body;
     let {
       title,
@@ -181,16 +175,14 @@ const updatePost = async function (req, res) {
         message: "Updated successfully",
         data: updatePost,
       });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+ 
 };
 
 
 
 
 const deletePostById = async function (req, res) {
-  try {
+  
     const postId = req.params.id;
     let id = req.token.userId;
     const findUser = await userModel.findById({_id:id});
@@ -212,10 +204,7 @@ const deletePostById = async function (req, res) {
     }
 
     else return res.status(403).send({status: false,message: "You are not allowed to do this action"});
-}
-   catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+
 }
 
 module.exports = {

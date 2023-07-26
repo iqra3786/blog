@@ -1,9 +1,10 @@
 const userModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-const axios=require('axios')
+const axios=require('axios');
+const { responseOk } = require('../helper/helper');
 
 const createUser = async function(req,res) {
-    try{
+   
         let {email, phone, password,firstName, lastName,role} = req.body;
         console.log(role)
         
@@ -20,16 +21,14 @@ const createUser = async function(req,res) {
         if(!role) return res.status(400).send({status:false, message:"Please mention your role => Admin or Editor or Viewer"});
 
         let userCreated = await userModel.create(req.body);
-        return res.status(201).send({status:true, message:"User Created Successfully",data:userCreated});
-    }
-    catch(err){
-        return res.status(500).send({status:false, message:err.message})
-    }
+        responseOk(req,res,"User Created Successfully",userCreated)
+   
+  
 }
 
 
 const login = async function(req,res){
-    try{
+  
         let {email,password} = req.body;
 
         let findUser = await userModel.findOne({email, password});
@@ -39,10 +38,8 @@ const login = async function(req,res){
         
         return res.status(200).send({status:true, message:"Logged In successufully", token:token})
 
-    }
-    catch(err){
-        return res.status(500).send({status:false, message:err.message})
-    }
+   
+   
 }
 
 

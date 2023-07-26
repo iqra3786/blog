@@ -3,7 +3,7 @@ const tagModel = require('../models/tagModel');
 const userModel = require('../models/userModel');
 
 const createTag = async function(req,res) {
-    try{
+    
         const {name} = req.body;
 
         if(!name) return res.status(400).send({status:false, message:"Tag name is mandatory"});
@@ -14,10 +14,7 @@ const createTag = async function(req,res) {
         const tagCreated = await tagModel.create(req.body);
 
         return res.status(201).send({status:true, message:"Tag created successfully",data:tagCreated})
-    }
-    catch(err) {
-        return res.status(500).send({status:false, message:err.message})
-    }
+    
 }
 
 

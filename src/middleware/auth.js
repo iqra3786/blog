@@ -23,7 +23,7 @@ const authentication = async function(req,res,next){
 const authorization = async function(req,res,next) {
     const {role} = req.token;
     console.log(role);
-    if(role == 'Admin'||role == 'Viewer') return next();
+    if(role == 'Admin'||role == 'User') return next();
 
     else return res.status(403).send({status:false, message:"Unauthorized User"})
 }

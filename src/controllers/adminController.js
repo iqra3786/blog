@@ -1,3 +1,4 @@
+const { responseError } = require('../helper/helper');
 const userModel = require('../models/userModel')
 
 const updateRoleByAdmin = async function(req,res){
@@ -7,8 +8,10 @@ const updateRoleByAdmin = async function(req,res){
         let {role} = req.body;
 
         let findUser = await userModel.findById({_id:adminId});
-        if(findUser.role !== 'Admin') return res.status(403).send({status:false,message:"You are not allowed to do this action"});
-     
+        if(findUser.role !== 'Admin') 
+        {
+return responseError(req,res,"You are not allowed to do this action",null,403)
+        }
         if(Object.keys(req.body).length == 0) return res.status(400).send({status:false, message:"Please provide data to update"})
         let updatedRole = await userModel.findByIdAndUpdate({_id:userId},{$set:req['body']},{new:true});
         return res.status(200).send({status:true,message:"Role updated successfully",data:updatedRole});

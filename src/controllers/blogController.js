@@ -5,10 +5,11 @@ const path = require("path");
 const userModel = require('../models/userModel')
 const mongoose=require('mongoose');
 const tagModel = require("../models/tagModel");
-//const ObjectId = mongoose.Schema.Types.ObjectId;
+const { responseError, responseOk } = require("../helper/helper");
+
 
 const createPost = async function (req, res) {
-  try {
+ 
     let {
       title,
       short_description,
@@ -19,20 +20,16 @@ const createPost = async function (req, res) {
     } = req.body;
     let image=req.file
     if(!image){
-      // return helper.responseError(req,res,"image is required",null)
-      return res.send({status:false,msg:"image is required"})
+      
+      return responseError(req,res, "image is required")
     }
      tag=JSON.parse(tag)
-    // console.log(typeof(tag))
-    //tag=tag.map(str=>new ObjectId(str))
+    
     
     const arrayOfObjectIds = tag.map(id => new mongoose.Types.ObjectId(id));
 
     // Create an instance of the model and set the "tag" field with the array of ObjectIds
     const instance = new tagModel({ tag: arrayOfObjectIds });
-    console.log(instance)
-    
-    console.log(tag)
     image = `${process.env.url}/image/${req.file.filename}`
 
     // let img = fs.readFileSync(profile_image);
@@ -53,32 +50,24 @@ const createPost = async function (req, res) {
       profile_image:image,
      
     });
-    return res
-      .status(201)
-      .send({
-        status: true,
-        message: "Post added successfully",
-        data: postCreated,
-      });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+    return responseOk(req,res,"Post added successfully",postCreated,201)
+ 
 };
 
 
 const getPostById = async function (req, res) {
-  try {
+  
     let postId = req.params.id;
-    if (!isValidObjectId(postId))
-      return res
-        .status(400)
-        .send({ status: false, message: "Not a valid object id" });
+    if (!isValidObjectId(postId)){
+      return responseError(req,res,"Not a valid object id")
+    }
+      
 
     const findPost = await postModel.findById({ _id: postId });
-    if (!findPost)
-      return res
-        .status(404)
-        .send({ status: false, message: "Post doesn't exist" });
+    if (!findPost){
+      return responseError(req,res,"Post doesn't exist",null,404)
+    }
+     
 
     
     
@@ -102,11 +91,9 @@ const getPostById = async function (req, res) {
       subcategory,
     };
 
-    //profile_image = resolvedPath;   
-    return res.status(200).send({ status: true, data: data });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+   return responseOk(req,res, "get post successfully",data)
+ 
+ 
 };
 
 
@@ -114,25 +101,23 @@ const getPostById = async function (req, res) {
 
 
 const getAllPosts = async function (req, res) {
-  try {
+ 
     const postList = await postModel.find();
-    if (!postList)
-      return res
-        .status(404)
-        .send({ status: false, message: "No post to show" });
+    if (!postList){
+      return responseError(req,res, "No post to show" ,null,404)
+    }
+      return responseOk(req,res,"get all post successfullly",postList)
 
-    return res.status(200).send({ status: true, data: postList });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+   
+
 };
 
 
 
 
 const updatePost = async function (req, res) {
-  try {
-    // let data = req.body;
+  
+    
     let {
       title,
       short_description,
@@ -140,18 +125,20 @@ const updatePost = async function (req, res) {
       category,
       subcategory,
       tag,
-      profile_image,
+     
       
     } = req.body;
+
+    let image=req.files
 
     const postId = req.params.id;
 
     if (!isValidObjectId(postId))
-      return res
-        .status(400)
-        .send({ status: false, message: "Not a valid object id" });
-
-       let image = `${process.env.url}/image/${req.file.filename}`
+    {
+      return responseError(req,res,"Not a valid object id")
+    }
+      
+       image = `${process.env.url}/image/${req.file.filename}`
 
         let data = {
           title,
@@ -170,27 +157,19 @@ const updatePost = async function (req, res) {
       { $set: data },
       { new: true }
     );
-    if (!updatePost)
-      return res
-        .status(404)
-        .send({ status: false, message: "Post doesn't exist" });
-    return res
-      .status(200)
-      .send({
-        status: true,
-        message: "Updated successfully",
-        data: updatePost,
-      });
-  } catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+    if (!updatePost){
+      return responseError(req,res,"Post doesn't exist")
+    }
+      return responseOk(req,res,"Updated successfully",updatePost)
+   
+ 
 };
 
 
 
 
 const deletePostById = async function (req, res) {
-  try {
+  
     const postId = req.params.id;
     let id = req.token.userId;
     const findUser = await userModel.findById({_id:id});
@@ -198,8 +177,11 @@ const deletePostById = async function (req, res) {
 
     let deleteFunc = async function(){
         const deletedPost = await postModel.findByIdAndDelete({ _id: postId });
-        if(!deletedPost) return res.status(404).send({status:false,message:"No Such post found"})
-        return res.status(200).send({ status: true, message: "Post deleted successfully" });
+        if(!deletedPost){
+          return responseError(req,res,"No Such post found",null,404)
+        } 
+        return responseOk(req,res,"Post deleted successfully")
+        
     }
 
     if(role =='Admin'){ 
@@ -210,12 +192,12 @@ const deletePostById = async function (req, res) {
             deleteFunc();
         }
     }
+    else{
+      return responseError(req,res,"You are not allowed to do this action",null,403)
 
-    else return res.status(403).send({status: false,message: "You are not allowed to do this action"});
-}
-   catch (err) {
-    return res.status(500).send({ status: false, message: err.message });
-  }
+    }
+    e
+
 }
 
 module.exports = {

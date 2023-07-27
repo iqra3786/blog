@@ -27,6 +27,7 @@ const createPost = async function (req, res) {
     
     
     const arrayOfObjectIds = tag.map(id => new mongoose.Types.ObjectId(id));
+    console.log(arrayOfObjectIds)
 
     // Create an instance of the model and set the "tag" field with the array of ObjectIds
     const instance = new tagModel({ tag: arrayOfObjectIds });
@@ -48,6 +49,7 @@ const createPost = async function (req, res) {
       subcategory,
       tag:instance,
       profile_image:image,
+      userId:req.token.userId
      
     });
     return responseOk(req,res,"Post added successfully",postCreated,201)
@@ -102,7 +104,7 @@ const getPostById = async function (req, res) {
 
 const getAllPosts = async function (req, res) {
  
-    const postList = await postModel.find();
+    const postList = await postModel.find().populate('category').populate({path:'comment',select:'comment replies'});
     if (!postList){
       return responseError(req,res, "No post to show" ,null,404)
     }
@@ -137,8 +139,10 @@ const updatePost = async function (req, res) {
     {
       return responseError(req,res,"Not a valid object id")
     }
-      
-       image = `${process.env.url}/image/${req.file.filename}`
+      if(image){
+        image = `${process.env.url}/image/${req.file.filename}`
+
+      }
 
         let data = {
           title,
@@ -149,6 +153,20 @@ const updatePost = async function (req, res) {
           tag,
           profile_image:image,
           
+        }
+        const blogDetails=await postModel.findOne({_id:postId})
+        console.log(blogDetails)
+        if(req.token.role == 'User'){
+    
+            if(blogDetails.userId==req.token.userId)
+            {
+              const updateBlog=await postModel.findOneAndUpdate({_id:postId},{ $set: data },
+        
+            {new:true})
+            return responseOk(req,res,"Updated successfully",updateBlog)}
+            else {
+              return responseError(req,res,"you are not able to authorise to edit this profile.")
+          }
         }
 
 
@@ -174,6 +192,7 @@ const deletePostById = async function (req, res) {
     let id = req.token.userId;
     const findUser = await userModel.findById({_id:id});
     let {role,permission} = findUser;
+    console.log(findUser)
 
     let deleteFunc = async function(){
         const deletedPost = await postModel.findByIdAndDelete({ _id: postId });
@@ -184,7 +203,7 @@ const deletePostById = async function (req, res) {
         
     }
 
-    if(role =='Admin'){ 
+    if(role =='Admin'||role=='User'){ 
         deleteFunc();
     }
     else if(permission.length !== 0) {
@@ -196,9 +215,10 @@ const deletePostById = async function (req, res) {
       return responseError(req,res,"You are not allowed to do this action",null,403)
 
     }
-    e
+    
 
 }
+
 
 module.exports = {
   createPost,

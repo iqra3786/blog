@@ -4,7 +4,7 @@ const {updateRoleByAdmin,getUserDetails} = require('../controllers/adminControll
 const {authentication, authorization} = require('../middleware/auth');
 
 
-router.put('/updateRole/:id',authentication, authorization, updateRoleByAdmin);
+//router.put('/updateRole/:id',authentication, authorization, updateRoleByAdmin);
 
 router.get('/getUserDetails/:id',authentication, authorization,getUserDetails)
 

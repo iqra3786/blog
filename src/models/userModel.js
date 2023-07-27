@@ -31,13 +31,19 @@ const userSchema = new mongoose.Schema({
         required:true,
         default:'User'
     },
-    permission:{
-        type:[String],
-        enum:['Create','Read','Update','Delete']
-    },
+   
+   
     token:{
         type:String,
         default:null
+    },
+    googleId:{
+type:String,
+default:null
+    },
+    logout:{
+type:Boolean,
+default:false
     }
 
 },{timestamps:true})

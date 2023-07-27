@@ -1,10 +1,14 @@
 const {responseOk}=require('../helper/helper')
+const blogModel=require('../models/blogModel')
+const commentModel=require('../models/commentModel')
 
 exports.commentOnBlog=async(req,res)=>{
     let{blogId,comment}=req.body
-    const newComment = (await commentModel.create({blogId:blogId,comment })).populate("blogId");
+    const newComment = await commentModel.create({blogId:blogId,comment });
+   const updateBlog=await blogModel.findOneAndUpdate({_id:blogId},{$set:{comment:newComment._id}},{new:true})
+   
       
-    return responseOk(req,res,"comment on blog successfully.",newComment)
+    responseOk(req,res,"comment on blog successfully.",newComment)
 }
 
 exports.commentReply=async(req,res)=>{
@@ -17,7 +21,7 @@ exports.commentReply=async(req,res)=>{
        
     comment.replies.push({ text });
     await comment.save();
-    helper.responseOk(req,res, "reply on comment sucessfully.",comment)
+    responseOk(req,res, "reply on comment sucessfully.",comment)
 
  
 }
@@ -27,6 +31,6 @@ exports.blogliked=async(req,res)=>{
     let data=await blogModel.findByIdAndUpdate(
         {_id:blogId,isDeleted:false},{$inc:{like:1}},{new:true}
     )
-    return helper.responseOk(req,res,"add like successfully.",data)
+    return responseOk(req,res,"add like successfully.",data)
 
 }

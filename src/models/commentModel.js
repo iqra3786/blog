@@ -9,7 +9,7 @@ const replySchema = new mongoose.Schema({
 // Define the schema for a comment
 const commentSchema = new mongoose.Schema({
   blogId:{type:ObjectId,
-  ref: 'blog',
+  ref: 'Post',
   required: true
 },
   comment: { type: String, required: true },

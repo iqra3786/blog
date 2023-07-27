@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 
 const authentication = async function(req,res,next){
     try{
-        let token = req.headers['x-api-key'];
+        let token = req.headers["authorization"];
         if(!token) return res.status(400).send({status:false, message:"Please provide token to login"});
-
+        token=token.replace("Bearer ", "")
         jwt.verify(token,'secret-key', function(err,decodedToken){
             if(err) return res.status(401).send({status:false, message:"Invalid Token"});
             req.token = decodedToken;

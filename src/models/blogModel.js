@@ -12,6 +12,10 @@ const postSchema = new mongoose.Schema({
         type:String,
         trim :true
     },
+    userId:{
+        type:ObjectId,
+        ref:'User'
+    },
     description:{
         type:String,
         trim:true
@@ -32,6 +36,23 @@ const postSchema = new mongoose.Schema({
     tag:{
         type:ObjectId,
         ref:'Tag'
+    },
+    like:{
+        type:Number,
+        default:0
+    },
+    comment:{
+        type:ObjectId,
+        ref:'Comment',
+        default:null
+    },
+    isDeleted:{
+        type:Boolean,
+        default:false
+    },
+    deletedAt:{
+        type:Date,
+        default:null
     }
     //tag: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }]
 

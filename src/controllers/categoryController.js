@@ -54,27 +54,27 @@ const updateCategoryById = async function (req, res) {
 
 
 const getAllCategories = async function (req, res) {
-  t
+ 
     const getAll = await categoryModel.find().select({ __v: 0 });
     if (!getAll){
       return responseError(req,res,"Can't get the categories",null,404)
       
     }
       
-   return responseOk(req,res, "get all category successfully")
+   return responseOk(req,res, "get all category successfully",getAll)
  
 };
 
 
 const getCatById = async function(req,res) {
-  t
+ 
     let catId = req.params.id;
     const findCategory = await categoryModel.findById({_id:catId});
     if(!findCategory) {
 
       return responseError(req,res,"Category not found",null,404)
     }
-    return responseOk(req,res,"get category successfully")
+    return responseOk(req,res,"get category successfully",catId)
 
 }
 

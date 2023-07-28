@@ -165,7 +165,7 @@ const updatePost = async function (req, res) {
             {new:true})
             return responseOk(req,res,"Updated successfully",updateBlog)}
             else {
-              return responseError(req,res,"you are not able to authorise to edit this profile.")
+              return responseError(req,res,"Sorry, You can not edit.")
           }
         }
 

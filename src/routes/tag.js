@@ -2,15 +2,15 @@ const express = require('express');
 const router = express.Router();
 const {createTag, updateTagById, getAllTags,getTagById,deleteTagById} = require('../controllers/tagController');
 const {authentication, authorization} = require('../middleware/auth');
+const {asyncWrapper}=require('../helper/helper')
+router.post('/create', authentication, authorization,asyncWrapper(createTag));
 
-router.post('/create', authentication, authorization,createTag);
+router.put('/update/:id', authentication,authorization,asyncWrapper(updateTagById));
 
-router.put('/update/:id', authentication,authorization,updateTagById);
+router.get('/getAll', asyncWrapper(getAllTags));
 
-router.get('/getAll', getAllTags);
+router.get('/getTagById/:id', asyncWrapper(getTagById));
 
-router.get('/getTagById', getTagById);
-
-router.delete('/delete/:id',authentication, authorization, deleteTagById);
+router.delete('/delete/:id',authentication, authorization, asyncWrapper(deleteTagById));
 
 module.exports = router;

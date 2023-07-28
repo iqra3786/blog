@@ -81,11 +81,7 @@ const deleteTagById = async function(req,res) {
         if(role =='Admin'){ 
             deleteFunc();
         }
-        else if(permission.length !== 0) {
-            if(permission.indexOf('Delete') !== -1){
-                deleteFunc();
-            }
-        }
+       
                 
         else return res.status(403).send({status: false,message: "You are not allowed to do this action"});
     

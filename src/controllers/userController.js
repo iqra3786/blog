@@ -2,6 +2,7 @@ const userModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const axios=require('axios');
 const { responseOk } = require('../helper/helper');
+const permisssionModel = require('../models/permisssionModel');
 
 const createUser = async function(req,res) {
    
@@ -21,7 +22,18 @@ const createUser = async function(req,res) {
         if(!role) return res.status(400).send({status:false, message:"Please mention your role => Admin or Editor or Viewer"});
 
         let userCreated = await userModel.create(req.body);
-        responseOk(req,res,"User Created Successfully",userCreated)
+        let data
+        if(role=='User'){
+          data=await permisssionModel.create({userId:userCreated._id,permission:["Read","Create"]})
+  
+        }
+        else if(role=='Admin'){
+         data=await permisssionModel.create({userId:userCreated._id,permission:
+        ['Create', 'Read', 'Update', 'Delete']
+    })
+        }
+        return res.status(201).send({status:true,message:"User Created Successfully",data:userCreated,permission:data})
+       
    
   
 }
@@ -38,6 +50,7 @@ const login = async function(req,res){
         }
 
         const token = jwt.sign({userId:findUser['_id'].toString(), role:findUser['role']}, 'secret-key');
+        const updateBlog=await userModel.findOneAndUpdate({_id:findUser._id},{$set:{token:token}},{new:true})
         
         return res.status(200).send({status:true, message:"Logged In successufully", token:token})
 

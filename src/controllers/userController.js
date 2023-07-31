@@ -2,7 +2,7 @@ const userModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const axios=require('axios');
 const { responseOk } = require('../helper/helper');
-const permisssionModel = require('../models/permisssionModel');
+const permisssionModel = require('../models/permissionModel');
 
 const createUser = async function(req,res) {
    

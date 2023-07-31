@@ -6,6 +6,7 @@ const userModel = require('../models/userModel')
 const mongoose=require('mongoose');
 const tagModel = require("../models/tagModel");
 const { responseError, responseOk } = require("../helper/helper");
+const permissionModel = require("../models/permissionModel");
 
 
 const createPost = async function (req, res) {
@@ -191,7 +192,12 @@ const deletePostById = async function (req, res) {
     const postId = req.params.id;
     let id = req.token.userId;
     const findUser = await userModel.findById({_id:id});
-    let {role,permission} = findUser;
+    let {role} = findUser;
+    let data=await permissionModel.findOne({userId:id})
+    let {permission}=data
+
+    console.log(data)
+   
     console.log(findUser)
 
     let deleteFunc = async function(){
@@ -203,12 +209,15 @@ const deletePostById = async function (req, res) {
         
     }
 
-    if(role =='Admin'||role=='User'){ 
+    if(role =='Admin'){ 
         deleteFunc();
     }
     else if(permission.length !== 0) {
         if(permission.indexOf('Delete') !== -1){
             deleteFunc();
+        }
+        else{
+          return responseError(req,res,"You are not allowed to do this action",null,403)
         }
     }
     else{
